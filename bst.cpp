@@ -2,10 +2,13 @@
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
+#include "node.h"
+#include "math.h"
 
 using namespace std;
 
-void sort(int* numbers, int size);
+int* sort(int* numbers, int size);
+void buildtree(int* numbers, int size);
 int char2int(char character);
 
 int main() { 
@@ -42,7 +45,7 @@ int main() {
                     numbers++;
                 }
                 inputfile.close();
-                sort(intarray, numbers);
+                //sort(intarray, numbers);
             }
             else {
                 cout << "Cannot open file." << endl;
@@ -62,9 +65,7 @@ int main() {
             bool escape = false;
            // while (numberinput[counter] != '?') {
             while (!escape) {
-                cout << "test1" << endl;
                 if (numberinput[counter] > 47 && numberinput[counter] < 58) { // if number
-                    cout << "number" << endl;
                     newnumber = char2int(numberinput[counter]);
                     if (numbersize < 5) {
                         currentnumber[numbersize] = newnumber;
@@ -72,12 +73,8 @@ int main() {
                     }
                     counter++;
                 }
-                else if (numberinput[counter] == ' ') { // if space
-                    cout << "space" << endl;
-                    if (numbersize == 4) {
-                        newnumber2 += 1000; // all 4 digit numbers will turn into 1000.
-                    }
-                    else if (numbersize == 3) {
+                else if (numberinput[counter] == ' ') { // if space         
+                    if (numbersize == 3) {
                         newnumber2 += (100 * currentnumber[0]);
                         newnumber2 += (10 * currentnumber[1]);
                         newnumber2 += currentnumber[2];
@@ -98,9 +95,38 @@ int main() {
                     counter++;
                     numbersize = 0;
                 }
-                else if (numberinput[counter] == '.') {
-                    cout << "test2" << endl;
-                    newnumber2 = char2int(numberinput[counter - 1]);
+                else if (numberinput[counter] == '.') { // deal with last number
+                    int  backup = 1;
+                    bool escape2 = false;
+                    while (!escape2) { // how far back to we have to go to find the start of the last number
+                        if (numberinput[counter - backup] > 47 && numberinput[counter - backup] < 58) {
+                            backup++;
+                        }
+                        else if (numberinput[counter - backup] == ' ') {
+                            cout << "backup: " << backup << endl;
+                            newnumber2 = 0;
+                            if ((backup - 1) == 3) {
+                                cout << "flag 3" << endl;
+                                newnumber2 += (100 * char2int(numberinput[counter - backup +1]));
+                                newnumber2 += (10 * char2int(numberinput[counter - backup + 2]));
+                                newnumber2 += char2int(numberinput[counter - backup + 3]);
+                            }
+                            else if ((backup - 1) == 2) {
+                                cout << "flag 2" << endl;
+                                newnumber2 += 10 * char2int(numberinput[counter - backup + 1]);
+                                newnumber2 += char2int(numberinput[counter - backup + 2]);
+                            }
+                            else if ((backup - 1) == 1) {
+                                cout << "flag 1" << endl;
+                                newnumber2 += char2int(numberinput[counter - backup +1]);
+                            }
+                            else {
+                                cout << "Invalid input." << endl;
+                            }
+                            escape2 = true;
+                        }
+                    }
+                    //newnumber2 = char2int(numberinput[counter - 1]);
                     intarray[counter2] = newnumber2;
                     counter++;
                     counter2++;
@@ -117,15 +143,16 @@ int main() {
             cout << "count2: " << counter2 << endl;
             cout << "intarray[3] " << intarray[3] << endl;
             if (outputfile.is_open()) {
+                cout << "test" << endl;
                 for (int i = 0; i < counter2; i++) {
                     outputfile << intarray[i] << "\n";
                 }
-                outputfile.close();
-                sort(intarray, numbers);
+                outputfile.close();  
             }
             else {
                 cout << "Could not open output.txt." << endl;
             }
+            buildtree(sort(intarray, counter2), counter2);
         }
         if (strcmp(input, "generate") == 0) { // generate .txt with 100 random numbers
             int random = 0;
@@ -161,7 +188,10 @@ int* sort(int* numbers, int size) {
         }
         numbers[highestindex] = 0;
         sorted[i] = highest;
+        cout << sorted[i] << endl;
+        output << sorted[i] << " ";
     }
+    output.close();
     return sorted;
 }
 
@@ -173,6 +203,30 @@ int char2int(char character) { // subtract 48 from ascii calue to get int
     }
 }
 
-void buildtree() {
-
+void buildtree(int* numbers, int size) {
+    cout << "build tree" << endl;
+    cout << "size " << size << endl;
+    Node* root = new Node();
+    root->setData(numbers[0]);
+    ofstream tree;
+    tree.open("tree.txt");
+    bool escape = false;
+    int tmp = 2;
+    int count = 0;
+    while (!escape) {
+        if (tmp < size) {
+            count++;
+            tmp = pow(2, count);
+        }
+        else {
+            escape = true;
+        }
+    }
+    cout << "tmp " << tmp << endl; // # of tabs before the root?
+    cout << "count " << count << endl; // tmp = # of rows/tabs between children of the root
+    for (int i = 0; i < tmp; i++) {
+        tree << "\t";
+    }
+    tree << root->getData();
+    tree.close();
 }
