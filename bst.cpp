@@ -22,6 +22,10 @@ int main() {
     for (int i = 0; i < 500; i++) {
         numberinput[i] = '?';
     }
+    char removeinput[3];
+    for (int i = 0; i < 3; i++) {
+        removeinput[i] = '?';
+    }
     int numbers = 0;
     int randomnumbers[100];
     int* intarray = new int[100];
@@ -168,12 +172,18 @@ int main() {
             randomfile.close();
             cout << "generated \"generated.txt\"" << endl;
         }
+        if (strcmp(input, "remove") == 0) {
+            cin.getline(removeinput, 3);
+            if (removeinput[2] > 47 && removeinput[2] < 58) {
+
+            }
+        }
     }
     return 0;
 }
 
 int* sort(int* numbers, int size) {
-    int sorted[100];
+    int* sorted = new int[100];
     int highest = 0;
     int highestindex;
     ofstream output;
@@ -206,8 +216,10 @@ int char2int(char character) { // subtract 48 from ascii calue to get int
 void buildtree(int* numbers, int size) {
     cout << "build tree" << endl;
     cout << "size " << size << endl;
+    cout << "numbers[0] " << numbers[0] << endl;
     Node* root = new Node();
     root->setData(numbers[0]);
+    cout << "root " << root->getData() << endl;
     ofstream tree;
     tree.open("tree.txt");
     bool escape = false;

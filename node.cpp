@@ -3,36 +3,36 @@
 //Binary Search Tree
 #include "node.h"
 Node::Node() {
-  leftP = 0;
-  rightP = 0;
-  data = 0;
+    leftP = 0;
+    rightP = 0;
+    data = 0;
 }
 
 Node::~Node() {
-  delete leftP;
-  delete rightP;
+    delete leftP;
+    delete rightP;
 }
 
-char Node::getData() {
-  return data;
+int Node::getData() {
+    return data;
 }
 
 Node* Node::getLeft() {
-  return leftP;
+    return leftP;
 }
 
 Node* Node::getRight() {
-  return rightP;
+    return rightP;
 }
 
 void Node::setData(char newdata) {
-  data = newdata;
+    data = newdata;
 }
 
 void Node::setLeft(Node* newleft) {
-  leftP = newleft;
+    leftP = newleft;
 }
 
 void Node::setRight(Node* newright) {
-  rightP = newright;
+    rightP = newright;
 }
