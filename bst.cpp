@@ -10,6 +10,7 @@ using namespace std;
 int* sort(int* numbers, int size);
 void buildtree(int* numbers, int size);
 int char2int(char character);
+void recursion(Node* root, int size, int* numbers);
 
 int main() { 
     bool choice = false;
@@ -107,21 +108,17 @@ int main() {
                             backup++;
                         }
                         else if (numberinput[counter - backup] == ' ') {
-                            cout << "backup: " << backup << endl;
                             newnumber2 = 0;
                             if ((backup - 1) == 3) {
-                                cout << "flag 3" << endl;
                                 newnumber2 += (100 * char2int(numberinput[counter - backup +1]));
                                 newnumber2 += (10 * char2int(numberinput[counter - backup + 2]));
                                 newnumber2 += char2int(numberinput[counter - backup + 3]);
                             }
                             else if ((backup - 1) == 2) {
-                                cout << "flag 2" << endl;
                                 newnumber2 += 10 * char2int(numberinput[counter - backup + 1]);
                                 newnumber2 += char2int(numberinput[counter - backup + 2]);
                             }
                             else if ((backup - 1) == 1) {
-                                cout << "flag 1" << endl;
                                 newnumber2 += char2int(numberinput[counter - backup +1]);
                             }
                             else {
@@ -144,10 +141,7 @@ int main() {
             ofstream outputfile;
             outputfile.open("output.txt");
             int x;
-            cout << "count2: " << counter2 << endl;
-            cout << "intarray[3] " << intarray[3] << endl;
             if (outputfile.is_open()) {
-                cout << "test" << endl;
                 for (int i = 0; i < counter2; i++) {
                     outputfile << intarray[i] << "\n";
                 }
@@ -156,7 +150,7 @@ int main() {
             else {
                 cout << "Could not open output.txt." << endl;
             }
-            buildtree(sort(intarray, counter2), counter2);
+            buildtree(intarray, counter2);
         }
         if (strcmp(input, "generate") == 0) { // generate .txt with 100 random numbers
             int random = 0;
@@ -182,7 +176,7 @@ int main() {
     return 0;
 }
 
-int* sort(int* numbers, int size) {
+int* sort(int* numbers, int size) { // didnt need this
     int* sorted = new int[100];
     int highest = 0;
     int highestindex;
@@ -198,7 +192,6 @@ int* sort(int* numbers, int size) {
         }
         numbers[highestindex] = 0;
         sorted[i] = highest;
-        cout << sorted[i] << endl;
         output << sorted[i] << " ";
     }
     output.close();
@@ -214,31 +207,53 @@ int char2int(char character) { // subtract 48 from ascii calue to get int
 }
 
 void buildtree(int* numbers, int size) {
-    cout << "build tree" << endl;
-    cout << "size " << size << endl;
-    cout << "numbers[0] " << numbers[0] << endl;
     Node* root = new Node();
     root->setData(numbers[0]);
-    cout << "root " << root->getData() << endl;
     ofstream tree;
     tree.open("tree.txt");
-    bool escape = false;
-    int tmp = 2;
-    int count = 0;
-    while (!escape) {
-        if (tmp < size) {
-            count++;
-            tmp = pow(2, count);
+    if (tree.is_open()) {
+        bool escape = false;
+        int tmp = 2;
+        int count = 0;
+        while (!escape) {
+            if (tmp < size) {
+                count++;
+                tmp = pow(2, count);
+            }
+            else {
+                escape = true;
+            }
         }
-        else {
-            escape = true;
+        cout << "tmp " << tmp << endl; // # of tabs before the root?
+        cout << "count " << count << endl; // tmp = # of rows/tabs between children of the root
+        for (int i = 0; i < tmp; i++) {
+            tree << "\t";
+        }
+        int index = 1;
+        tree << root->getData() << "\n";
+        recursion(root, size, numbers);
+        /*int numberoftabs = tmp / 2;
+        for (int i = 0; i < count; i++) {
+            for (int j = 0; j < numberoftabs; j++) {
+                tree << "\t";
+            }
+
+        }*/
+        tree.close();
+    }
+    else {
+        cout << "for some reason the file cannot be opened?" << endl;
+    }
+}
+
+void recursion(Node* root, int size, int* numbers) {
+    for (int i = 0; i < size; i++) {
+        Node* child = new Node();
+        if (root->getLeft() == 0) {
+            root->setLeft(child);
+        }
+        if (root->getRight() == 0) {
+            root->setRight(child);
         }
     }
-    cout << "tmp " << tmp << endl; // # of tabs before the root?
-    cout << "count " << count << endl; // tmp = # of rows/tabs between children of the root
-    for (int i = 0; i < tmp; i++) {
-        tree << "\t";
-    }
-    tree << root->getData();
-    tree.close();
 }
